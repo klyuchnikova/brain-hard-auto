@@ -1,0 +1,55 @@
+### Task
+Your task is to evaluate how well the following input prompts can assess the capabilities of advanced AI assistants.
+For the input prompt, please analyze it based on the following 7 criteria giving a 1 to 5 mark for each.
+1. Specificity
+    - Characteristics: whether the question requires a specific output, such as code, a mathematical solution, a logical simplification, a problem-solving strategy, or a hardware setup recommendation. 
+    - 1 grade means that the question does not require any specific structure.
+    - 5 grade means that the question requires a complex and specific structure such as mentioned.
+    - Examples: If answer format is given it's a 5. "Write python implementation of factorial" is 5, "Can you describe an elephant?" is 1.
+2. Domain Knowledge
+    - Characteristics: whether the question covers a specific domain, such as programming, mathematics, history etc. 
+    - 1 grade means that the answer does not require any deep knowledge of a specific domain, common knowledge is enough.
+    - 5 grade means that the question touches a range of topics or/and different domains.
+    - Examples: "Who was the president of the US in 1975?" is 4 since a medium level specialist would answer, "What is the name of the highest mountain" is 1 since everyone knows that.
+3. Complexity
+    - Characteristics: whether the question requires a complex, multi-step solution.
+    - 1 grade means that the answer does not require any thought process or uncommon knowledge.
+    - 5 grade means that the question requires a complex multi step thought.
+    - Examples: "What's a python?" is 1. "How can I reload windows?" is 2. Any difficult math / physics task is 5.
+4. Problem-Solving Skills
+    - Characteristics: whether the answer should demonstrate active problem-solving skills.
+    - 1 grade means that the answer does not require any thought process and is regurgitating an existing fact. 
+    - 5 grade means that the question requires a complex multi step thought.
+    - "Can you name top cat breeds?" is 2 since it almost does not require thought process. "you are given a task to detect number of faces in each frame of any video using pytorch" is 5.
+5. Creativity
+    - Characteristics: assesses whether the response requires to think up a creative novel approach.
+    - 1 grade means that the answer requires a straightforward or factual response with no creativity.
+    - 5 grade means that the question invites a highly creative or novel approach, requiring the generation of unique ideas or solutions.
+    - Examples: "Can you write code to print hello" is 2. "Can you think of a story ending that goes like this..." is 5.
+6. Technical Accuracy
+    - Characteristics: assesses the levels of technical accuracy required for technical fields.
+    - 1 grade means that the answer can be very general or imprecise, with no need for specific technical accuracy.
+    - 5 grade means that the response must be meticulously accurate, reflecting deep technical expertise and attention to detail.
+    - Examples: "Can a three year old ride a bysicle" is 1, "How old is Donald Trump?" is 5.
+7. Real-world Application
+    - Characteristics: how much thr prompt relates to real-world applications.
+    - 1 grade means that the question pertains to theoretical knowledge or information with no direct application.
+    - 5 grade means that the question demands an actionable solution applicable to real-life situations, requiring practical implementation guidance.
+    - Examples: "how much sweets can I eat before I get sick" is 3, "write bash file to start jupyter" is 5.
+Do not add anything additional to your answer.
+
+### Example
+-- Input:
+{
+    "prompt": Write a Python function that calculates the factorial of a number using recursion.
+}
+-- Output:
+{
+    "specificity": 5,
+    "domain_knowledge": 4,
+    "complexity": 3,
+    "problem_solving": 3,
+    "creativity": 2,
+    "technical_accuracy": 4,
+    "real_world": 4
+}

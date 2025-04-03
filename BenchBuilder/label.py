@@ -43,7 +43,18 @@ def get_endpoint(endpoint_list):
     return api_dict
 
 
-def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=None):
+def log_message(message):
+    if len(message) > 150:
+        print(f"{time.time()}: {message[:100]}...{message[-20:]}")
+    else:
+        print(f"{time.time()}: {message}")
+
+
+def log_error(e):
+    print(f"{time.time()}: {type(e)}: {e}")
+
+
+def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=None, response_format=None):
     import openai
 
     if api_dict:
@@ -54,40 +65,66 @@ def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=No
     else:
         client = openai.OpenAI()
 
-    output = API_ERROR_OUTPUT
+    chat_completion_args = {
+        "model" : model,
+        "messages" : messages,
+        "temperature" : temperature,
+        "max_tokens" : max_tokens
+    }
+
+    if response_format is not None:
+        chat_completion_args["extra_body"] = {"guided_json": response_format}
+
+    def parse_completion(completion):
+        if completion.choices is not None:
+            choice = completion.choices[0]
+        else:
+            if hasattr(completion.response, 'choices'):
+                choice = completion.response.choices[0]
+            else:
+                choice = completion.response["choices"][0]
+
+        if hasattr(choice, 'message'):
+            message = choice.message
+        elif isinstance(choice, dict) and 'message' in choice:
+            message = choice['message']
+        else:
+            raise TypeError(f"Unexpected choice structure: {choice}")
+
+        if hasattr(message, 'content'):
+            content = message.content
+        elif isinstance(message, dict) and 'content' in message:
+            content = message['content']
+        else:
+            raise TypeError(f"Unexpected choice structure: {choice}")
+        return content
+
+    content = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
+        completion = None
         try:
-            # print(messages)
-            completion = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                # extra_body={"guided_choice": GUIDED_CHOICES} if GUIDED_CHOICES else None,
-            )
-            output = completion.choices[0].message.content
-            # print(output)
+            completion = client.chat.completions.create(**chat_completion_args)
+            content = parse_completion(completion)
             break
         except openai.RateLimitError as e:
-            print(type(e), e)
+            log_error(e)
             time.sleep(API_RETRY_SLEEP)
         except openai.BadRequestError as e:
-            print(messages)
-            print(type(e), e)
+            log_message(f"Bad request, messages: {messages}")
+            log_error(e)
+        except KeyError:
+            print(type(e), e, completion)
             break
-        except openai.APIConnectionError as e:
-            print(messages)
-            print(type(e), e)
-            time.sleep(API_RETRY_SLEEP)
-        except openai.InternalServerError as e:
-            print(messages)
-            print(type(e), e)
-            time.sleep(API_RETRY_SLEEP)
         except Exception as e:
-            print(type(e), e)
-            break
-
-    return output
+            try:
+                models = client.models.list()
+                log_message(f"Api Client got available models: {models}, however something went wrong for {model}")
+            except:
+                log_message(f"Api Client unreachable")
+            log_error(e)
+            print(f"Received completion: {completion}")
+            raise
+    return content
 
 
 def chat_completion_anthropic(model, messages, temperature, max_tokens, api_dict=None):
@@ -132,7 +169,7 @@ def get_answer(
     api_dict: dict,
     categories: list,
     api_type: str,
-    testing: bool,
+    testing: bool
 ):
     if "category_tag" in question:
         category_tag = question["category_tag"]
@@ -150,6 +187,7 @@ def get_answer(
                 temperature=temperature,
                 max_tokens=max_tokens,
                 api_dict=api_dict,
+                response_format=category.output_schema
             )
         elif api_type == "anthropic":
             output = chat_completion_anthropic(
