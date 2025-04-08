@@ -139,6 +139,10 @@ def load_structure_file(file_path):
         pass
     raise RuntimeError(f"Failed to parse the structure file: {file_path}. Ensure it is valid JSON or YAML.")
 
+def load_system_prompt(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
 def chat_completion_local(model: str, messages, temperature: float, max_tokens: int, api_dict=None):
     client = LocalClient(
         model=model,

@@ -20,6 +20,7 @@ from utils import (
     load_questions,
     load_model_answers,
     load_structure_file,
+    load_system_prompt,
     make_config,
     get_endpoint,
     chat_completion_openai,
@@ -171,6 +172,19 @@ if __name__ == "__main__":
         if not os.path.exists(structure_config):
             raise RuntimeError("Could not find the output structure file while it was set. Please check that path: \"{structure_config}\" is correct")
         endpoint_list[model]["output_structured"] = load_structure_file(structure_config)
+
+    # Loading system prompts
+    for model in settings["model_list"]:
+        if isinstance(model, dict):
+            model = list(model.keys())[0]
+        system_prompt = endpoint_list[model].get("system_prompt")
+        if not system_prompt:
+            continue
+        if os.path.exists(system_prompt):
+            endpoint_list[model]["output_structured"] = load_system_prompt(structure_config)
+        else:
+            log_message(f"System prompt will be used directly as a string, if it is a path ensure it is correct \"{system_prompt[:100]}\"")
+       
 
     for model in settings["model_list"]:
         if isinstance(model, dict):
