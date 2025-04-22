@@ -19,8 +19,8 @@ class Category:
         pass
 
     @staticmethod
-    def create_category(name):
-        if name == "criteria_v0.1":
+    def create_category(name=None):
+        if name is None or name == "criteria_v0.1":
             return CategoryHardPrompt()
         raise Exception(f"Category name is incorrect: {name}")
 
@@ -33,19 +33,18 @@ class CategoryHardPrompt(Category):
         super().__init__()
         self.name_tag = "criteria_v0.1"
         self.pattern = re.compile(r"(\[[1234567](?:\,\s[1234567])*\])")
-        asssets_folder = os.path.join(os.path.dirname(__file__), 'asssets')
+        asssets_folder = os.path.join(os.path.dirname(__file__), 'assets')
 
-        with open(os.path.join(asssets_folder, "shema.json"), 'r', encoding='utf-8') as file:
+        with open(os.path.join(asssets_folder, "schema.json"), 'r', encoding='utf-8') as file:
             self.output_schema = json.load(file)
 
         with open(os.path.join(asssets_folder, "prompt.txt"), 'r', encoding='utf-8') as file:
             self.sys_prompt = file.read()
-        self.content_prompt = """Do not add anything additional to your answer.
+        self.content_prompt = """
 --- Input:
-{
-    "prompt": {{prompt}}
-}
---- Output:"""
+{{
+    "prompt": {prompt}
+}}"""
 
         self.tags = {
             1: "specificity",

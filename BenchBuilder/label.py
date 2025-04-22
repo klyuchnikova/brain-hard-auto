@@ -126,7 +126,6 @@ def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=No
             raise
     return content
 
-
 def chat_completion_anthropic(model, messages, temperature, max_tokens, api_dict=None):
     import anthropic
 
@@ -247,6 +246,7 @@ def find_required_tasks(row):
         )
     ]
 
+
 def _get_prompt(convo: List[Dict]):
     prompt = ""
     for i in range(0, len(convo), 2):
@@ -256,12 +256,12 @@ def _get_prompt(convo: List[Dict]):
             prompt += f"{convo[i]['content'][0]}\n"
     return prompt
 
+
 def _get_uid(row: pd.Series):
     if "question_id" in row.index and "tstamp" in row.index:
         return str(row["question_id"]) + str(row["tstamp"])
     else:
         return str(row.name)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -292,7 +292,6 @@ if __name__ == "__main__":
         data = orjson.loads(f.read())
     input_data = pd.DataFrame(data)
 
-    # much faster than pd.apply
     input_data["uid"] = input_data.apply(_get_uid, axis=1)
     assert len(input_data) == len(input_data.uid.unique())
     print(f"{len(input_data)}# of input data just loaded")

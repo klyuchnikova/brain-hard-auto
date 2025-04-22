@@ -1,6 +1,6 @@
 {
     "name": "evaluate_attributes",
-    "description": "Evaluates various attributes on a scale from 1 to 5",
+    "description": "Evaluates various attributes on a scale from 1 to 5 and give an answer",
     "parameters": {
         "type": "object",
         "properties": {
@@ -45,8 +45,29 @@
                 "description": "Rating for real-world applicability, from 1 to 5",
                 "minimum": 1,
                 "maximum": 5
+            },
+            "context_complete": {
+                "type": "integer",
+                "description": "Rating for context completeness, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "answer": {
+                "type": "string",
+                "description": "Answer to the prompt"
             }
         },
-        "required": ["specificity", "domain_knowledge", "complexity", "problem_solving", "creativity", "technical_accuracy", "real_world"]
+        "required": [
+            "specificity",
+            "domain_knowledge",
+            "complexity",
+            "problem_solving",
+            "creativity",
+            "technical_accuracy",
+            "real_world",
+            "context_complete",
+            "answer"
+        ],
+        "additionalProperties": false
     }
 }
