@@ -83,7 +83,7 @@ def to_arena_hard_questions_format(conversations: List[Dict], clusters: List[int
 
         arena_hard_questions.append({
             "question_id": f"{i}",
-            "category": "arena-hard-v0.1",
+            "category": "brain-hard-v0.1",
             "cluster": cluster_number_to_name[str(cluster)],
             "turns": turns_list
         })

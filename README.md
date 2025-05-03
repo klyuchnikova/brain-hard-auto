@@ -1,10 +1,6 @@
-# Arena-Hard-Auto
+# Brain-Hard-Auto
 
-> 🚨 New feature: **Style Control** is now added to Arena Hard Auto! Check this [section](#style-control) to start using style control!
-
-Arena-Hard-Auto-v0.1 ([See Paper](https://arxiv.org/abs/2406.11939)) is an automatic evaluation tool for instruction-tuned LLMs. It contains 500 challenging user queries sourced from Chatbot Arena. We prompt GPT-4-Turbo as judge to compare the models' responses against a baseline model (default: GPT-4-0314). Notably, Arena-Hard-Auto has the highest correlation and separability to Chatbot Arena among popular open-ended LLM benchmarks ([See Paper](https://arxiv.org/abs/2406.11939)). If you are curious to see how well your model might perform on Chatbot Arena, we recommend trying Arena-Hard-Auto.
-
-Although both Arena-Hard-Auto and Chatbot Arena Category Hard ([See Blog](https://lmsys.org/blog/2024-05-17-category-hard/)) employ similar pipeline to select hard prompts, Arena-Hard-Auto employs automatic judge as a cheaper and faster approximator to human preference. Checkout [BenchBuilder](BenchBuilder) folder for code and resources on how we curate Arena-Hard-Auto. In the paper we also purposed metrics, such as model separability and agreement to human preference, for evaluating benchmarks' ability to rank models (See [Evaluate Benchmarks](#evaluate-benchmarks) for more information and code).
+This work is a version of Arena-Hard-Auto-v0.1 ([See Paper](https://arxiv.org/abs/2406.11939)) which is an automatic evaluation tool for instruction-tuned LLMs. It contains 500 challenging user queries sourced from Chatbot Arena. They promptrf GPT-4-Turbo as judge to compare the models' responses against a baseline model (default: GPT-4-0314). Notably, Arena-Hard-Auto has the highest correlation and separability to Chatbot Arena among popular open-ended LLM benchmarks ([See Paper](https://arxiv.org/abs/2406.11939)).
 
 ## Content
 - [Style Control Leaderboard](#style-control-leaderboard)
@@ -181,28 +177,60 @@ pip install -r requirements-optional.txt  # Optional dependencies (e.g., anthrop
 ```
 
 ## Download dataset
-We have pre-generated many popular models answers and judgments. You can browse them with an online [demo](https://huggingface.co/spaces/lmsys/arena-hard-browser) or download them (with [`git-lfs`](https://git-lfs.com) installed) by
-```console
-> git clone https://huggingface.co/spaces/lmsys/arena-hard-browser
-// copy answers/judgments to the data directory
-> cp -r arena-hard-browser/data . 
-```
-Then run
-```console
-> python show_result.py
-gpt-4-0125-preview             | score: 78.0  | 95% CI: (-1.8, 2.2)  | average #tokens: 619
-claude-3-opus-20240229         | score: 60.4  | 95% CI: (-2.6, 2.1)  | average #tokens: 541
-gpt-4-0314                     | score: 50.0  | 95% CI:  (0.0, 0.0)  | average #tokens: 423
-claude-3-sonnet-20240229       | score: 46.8  | 95% CI: (-2.7, 2.3)  | average #tokens: 552
-claude-3-haiku-20240307        | score: 41.5  | 95% CI: (-2.4, 2.5)  | average #tokens: 505
-gpt-4-0613                     | score: 37.9  | 95% CI: (-2.1, 2.2)  | average #tokens: 354
-mistral-large-2402             | score: 37.7  | 95% CI: (-2.9, 2.8)  | average #tokens: 400
-Qwen1.5-72B-Chat               | score: 36.1  | 95% CI: (-2.1, 2.4)  | average #tokens: 474
-command-r-plus                 | score: 33.1  | 95% CI: (-2.0, 1.9)  | average #tokens: 541
-```
-Running `show_result.py` will save generated battles into `data/arena_hard_battles.jsonl` and bootstrapping statistics into `data/bootstrapping_results.jsonl`. If you don't want to regenerate battles or bootstrapping statistics, simply toggle argument `--load-battles` or `--load-bootstrap`, respectively.
+We have pre-generated many popular models answers and judgments. Check out the `/datasets` folder to figure out the way you want to compose the dataset. There is a ready set of 400 examples in the `data/arena-hard-v0.1/sampled_questions.jsonl`
 
-## Evaluate
+## Chosen models for the evaluation
+
+Here's the markdown table with the Quantized column excluded:
+
+```markdown
+| Model Name                                  | Maintainer       | Size | Score | VRAM (GB) | License         | Context Len | Likes | Downloads | Modified    | Languages                          | Architectures        |
+|---------------------------------------------|------------------|------|-------|-----------|-----------------|-------------|-------|-----------|-------------|------------------------------------|----------------------|
+| Bitnet B1.58 2B 4T                         | microsoft        | 2B   | 0.56  | 1.2       | mit             | 4K          | 399   | 4623      | 2025-04-17  | en                                 | BitnetForCausalLM    |
+| Phi 4 Mini Instruct                         | microsoft        | 4B   | 0.55  | 7.7       | mit             | 128K        | 440   | 308905    | 2025-03-10  | •                                  | Phi3ForCausalLM      |
+| DeepSeek R1 Distill Qwen 1.5B               | deepseek-ai      | 2B   | 0.53  | 3.5       | mit             | 128K        | 1163  | 1696894   | 2025-02-24  | •                                  | Qwen2ForCausalLM     |
+| Phi 3 Mini 4K Instruct                      | microsoft        | 4B   | 0.52  | 7.7       | mit             | 4K          | 1172  | 835997    | 2024-09-20  | en, fr                             | Phi3ForCausalLM      |
+| Llama 3.2 3B Instruct                       | meta-llama       | 3B   | 0.5   | 6.5       | llama3.2        | 128K        | 1363  | 1367670   | 2024-10-24  | en, de, fr, it, pt, hi, es, th     | LlamaForCausalLM     |
+| Gemma 3 1B It                               | google           | 1B   | 0.5   | 2         | gemma           | 32K         | 321   | 1627903   | 2025-04-04  | •                                  | Gemma3ForCausalLM    |
+| SmolLM2 1.7B Instruct                       | HuggingFaceTB    | 2B   | 0.48  | 3.4       | apache-2.0      | 8K          | 595   | 78510     | 2025-03-06  | en                                 | LlamaForCausalLM     |
+| Llama 3.2 1B                                | meta-llama       | 1B   | 0.46  | 2.5       | llama3.2        | 128K        | 1840  | 2024482   | 2024-10-24  | en, de, fr, it, pt, hi, es, th     | LlamaForCausalLM     |
+| Llama 3.2 1B Instruct                       | meta-llama       | 1B   | 0.46  | 2.5       | llama3.2        | 128K        | 886   | 2299850   | 2024-10-24  | en, de, fr, it, pt, hi, es, th     | LlamaForCausalLM     |
+| Granite 3.1 2B Instruct                     | ibm-granite      | 2B   | 0.46  | 5.1       | apache-2.0      | 128K        | 48    | 30744     | 2025-04-16  | •                                  | GraniteForCausalLM   |
+| Phi 3.5 Mini Instruct                       | microsoft        | 4B   | 0.45  | 7.7       | mit             | 128K        | 851   | 295670    | 2025-03-02  | •                                  | Phi3ForCausalLM      |
+| Phi 3 Mini 128K Instruct                    | microsoft        | 4B   | 0.44  | 7.7       | mit             | 128K        | 1638  | 443733    | 2025-03-02  | en                                 | Phi3ForCausalLM      |
+| Qwen2.5 3B Instruct                         | Qwen             | 3B   | 0.44  | 6.2       | other           | 32K         | 237   | 1041285   | 2024-09-25  | en                                 | Qwen2ForCausalLM     |
+| SmallThinker 3B Preview                     | PowerInfer       | 3B   | 0.44  | 6.8       | •               | 32K         | 394   | 55459     | 2025-01-16  | en                                 | Qwen2ForCausalLM     |
+| Qwen2.5 1.5B Instruct                       | Qwen             | 2B   | 0.43  | 3.1       | apache-2.0      | 32K         | 408   | 925377    | 2024-09-25  | en                                 | Qwen2ForCausalLM     |
+| DeepScaleR 1.5B Preview                     | agentica-org     | 2B   | 0.43  | 7.1       | mit             | 128K        | 547   | 56394     | 2025-04-09  | en                                 | Qwen2ForCausalLM     |
+| EXAONE 3.5 2.4B Instruct                    | LGAI-EXAONE      | 2B   | 0.42  | 9.7       | other           | 32K         | 154   | 55174     | 2024-12-11  | en, ko                             | ExaoneForCausalLM    |
+| ReaderLM V2                                 | jinaai           | 2B   | 0.42  | 3.1       | cc-by-nc-4.0    | 500K        | 607   | 71720     | 2025-03-04  | •                                  | Qwen2ForCausalLM     |
+| Phi 2                                       | microsoft        | 3B   | 0.41  | 5.6       | mit             | 2K          | 3310  | 714731    | 2024-04-29  | en                                 | PhiForCausalLM       |
+| Gemma 2 2B It                               | google           | 2B   | 0.41  | 5.2       | gemma           | 8K          | 908   | 421819    | 2024-08-27  | •                                  | Gemma2ForCausalLM    |
+| Llama 3.2 3B                                | meta-llama       | 3B   | 0.41  | 6.5       | llama3.2        | 128K        | 548   | 744931    | 2024-10-24  | en, de, fr, it, pt, hi, es, th     | LlamaForCausalLM     |
+| Granite 3.0 2B Instruct                     | ibm-granite      | 2B   | 0.41  | 5.3       | apache-2.0      | 4K          |       |           |             |                                    |                      |
+| Granite 3.2 2B Instruct                     | ibm-granite      | 2B   | 0.41  | 5.1       | apache-2.0      | 128K        | 45    | 25368     | 2025-04-17  | •                                  | GraniteForCausalLM   |
+| Cogito V1 Preview Llama 3B                  | deepcogito       | 3B   | 0.41  | 7.2       | llama3.2        | 128K        | 90    | 6274      | 2025-04-08  | •                                  | LlamaForCausalLM     |
+| Gemma 3 1B Pt                               | google           | 1B   | 0.4   | 2         | gemma           | 32K         | 106   | 145045    | 2025-03-21  | •                                  | Gemma3ForCausalLM    |
+| Mxbai Rerank Large V2                       | mixedbread-ai    | 2B   | 0.4   | 3.1       | apache-2.0      | 32K         | 79    | 115271    | 2025-04-02  | en, zh, de, ja, ko, es, fr, ar, bn, ru, id, sw, te, th | Qwen2ForCausalLM     |
+| EXAONE Deep 2.4B                            | LGAI-EXAONE      | 2B   | 0.4   | 4.8       | other           | 32K         | 89    | 48060     | 2025-03-22  | en, ko                             | ExaoneForCausalLM    |
+| DeepCoder 1.5B Preview                      | agentica-org     | 2B   | 0.4   | 7.1       | mit             | 128K        | 61    | 1915      | 2025-04-09  | en                                 | Qwen2ForCausalLM     |
+| Granite 3.3 2B Instruct                     | ibm-granite      | 2B   | 0.4   | 5.1       | apache-2.0      | 128K        | 16    | 21099     | 2025-04-16  | •                                  | GraniteForCausalLM   |
+| Falcon3 3B Instruct                         | tiiuae           | 3B   | 0.39  | 6.5       | other           | 32K         | 26    | 31727     | 2025-01-10  | en, fr, es, pt                     | LlamaForCausalLM     |
+| ZR1 1.5B                                    | Zyphra           | 2B   | 0.39  | 7.1       | mit             | 128K        | 56    | 1151      | 2025-04-09  | en                                 | Qwen2ForCausalLM     |
+| Qwen2.5 3B                                  | Qwen             | 3B   | 0.38  | 6.2       | other           | 32K         | 107   | 367056    | 2024-09-20  | en                                 | Qwen2ForCausalLM     |
+| Qwen2.5 1.5B                                | Qwen             | 2B   | 0.38  | 3.1       | apache-2.0      | 128K        | 97    | 729705    | 2024-10-08  | en                                 | Qwen2ForCausalLM     |
+| TinyLlama 1.1B Chat V1.0                    | TinyLlama        | 1B   | 0.37  | 2.2       | apache-2.0      | 2K          | 1227  | 1068970   | 2024-03-17  | en                                 | LlamaForCausalLM     |
+| OLMoE 1B 7B 0125 Instruct                   | allenai          | 1B   | 0.37  | 13.8      | apache-2.0      | 4K          | 45    | 11286     | 2025-02-04  | en                                 | OlmoeForCausalLM     |
+| Gemma 2 2B                                  | google           | 2B   | 0.36  | 10.5      | gemma           | 8K          | 487   | 182986    | 2024-08-07  | •                                  | Gemma2ForCausalLM    |
+| Hermes 3 Llama 3.2 3B                       | NousResearch     | 3B   | 0.36  | 6.5       | llama3          | 128K        | 151   | 12976     | 2024-12-18  | en                                 | LlamaForCausalLM     |
+| Falcon3 1B Instruct                         | tiiuae           | 1B   | 0.36  | 3.3       | other           | 8K          | 34    | 36207     | 2025-01-10  | en, fr, es, pt                     | LlamaForCausalLM     |
+| Tiny Qwen2ForCausalLM 2.5                   | trl-internal-testing | 2M | 0.36 | •         | •               | 32K         | •     | 2060477   | 2024-11-25  | •                                  | Qwen2ForCausalLM     |
+| Bitnet B1.58 2B 4T Bf16                     | microsoft        | 2B   | 0.36  | 4.8       | mit             | 4K          | 10    | 385       | 2025-04-17  | en                                 | BitnetForCausalLM    |
+| Kimina Prover Preview Distill 1.5B          | AI-MO            | 2B   | 0.36  | 3.5       | apache-2.0      | 16K         | 8     | 3576      | 2025-04-16  | en                                 | Qwen2ForCausalLM     |
+| Llama 3.2 1B Instruct                       | unsloth          | 1B   | 0.35  | 2.5       | llama3.2        | 128K        | 70    | 145670    | 2025-02-25  | en                                 | LlamaForCausalLM     |
+| DeepSeek R1 Distill Llama 3B                | suayptalha       | 3B   | 0.35  | 6.5       | mit             | 128K        | 11    | 761       | 2025-02-26  | en                                 | LlamaForCausalLM     |
+| Phi 4 Mini Instruct                         | unsloth          | 4B   | 0.35  | 7.7       | mit             | 128K        |       |           |             |                                    |                      |
+```
 
 ### Step 1. Set up the endpoint config to your model
 
@@ -315,9 +343,6 @@ Statistical measures like Pearson (Pearson, 1895) and Spearman Correlations (Spe
 **Separability with Confidence** quantifies the benchmark’s confidence by measuring its consistency in predicting the winner of a model pair across random seeds through bootstrapping. This is done by calculating the percentage of model pairs that have non-overlapping confidence intervals of their benchmark scores. A higher percentage indicates that the benchmark is more confident in distinguishing between the performance of different models, as the confidence intervals of their scores do not overlap.
 
 For **Agreement with Confidence**, and **Pair Rank Brier Score**, please refer to section 3 of our [paper](https://arxiv.org/abs/2406.11939). The code for calculating these metrics can be found in this [colab notebook](https://colab.research.google.com/drive/1ar6XLWREN_dXEh404WNOxroFVUe_4njp). 
-
-## Community Contribution
-Coming soon...
 
 ## Citation
 The code in this repository is developed from the papers below. Please cite it if you find the repository helpful.

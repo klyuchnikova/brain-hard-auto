@@ -1,6 +1,6 @@
-name: config of answer generation for arena-hard-v0.1
+name: config of answer generation for brain-hard-v0.1
 
-bench_name: arena-hard-v0.1
+bench_name: brain-hard-v0.1
 
 temperature: 0.0
 max_tokens: 2048
