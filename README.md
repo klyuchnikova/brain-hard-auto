@@ -181,9 +181,6 @@ We have pre-generated many popular models answers and judgments. Check out the `
 
 ## Chosen models for the evaluation
 
-Here's the markdown table with the Quantized column excluded:
-
-```markdown
 | Model Name                                  | Maintainer       | Size | Score | VRAM (GB) | License         | Context Len | Likes | Downloads | Modified    | Languages                          | Architectures        |
 |---------------------------------------------|------------------|------|-------|-----------|-----------------|-------------|-------|-----------|-------------|------------------------------------|----------------------|
 | Bitnet B1.58 2B 4T                         | microsoft        | 2B   | 0.56  | 1.2       | mit             | 4K          | 399   | 4623      | 2025-04-17  | en                                 | BitnetForCausalLM    |
@@ -230,7 +227,46 @@ Here's the markdown table with the Quantized column excluded:
 | Llama 3.2 1B Instruct                       | unsloth          | 1B   | 0.35  | 2.5       | llama3.2        | 128K        | 70    | 145670    | 2025-02-25  | en                                 | LlamaForCausalLM     |
 | DeepSeek R1 Distill Llama 3B                | suayptalha       | 3B   | 0.35  | 6.5       | mit             | 128K        | 11    | 761       | 2025-02-26  | en                                 | LlamaForCausalLM     |
 | Phi 4 Mini Instruct                         | unsloth          | 4B   | 0.35  | 7.7       | mit             | 128K        |       |           |             |                                    |                      |
-```
+
+## Quantized Models for Phi 3.5 Mini Instruct
+
+1. [BNB 4-bit] [unsloth/Phi-3.5-mini-instruct-bnb-4bit](https://huggingface.co/unsloth/Phi-3.5-mini-instruct-bnb-4bit)
+2. [AWQ] [flowaicom/Flow-Judge-v0.1-AWQ](https://huggingface.co/flowaicom/Flow-Judge-v0.1-AWQ)
+3. [FP8 KV] [RedHatAI/Phi-3.5-mini-instruct-FP8-KV](https://huggingface.co/RedHatAI/Phi-3.5-mini-instruct-FP8-KV)
+4. [ONNX INT4] [nvidia/Phi-3.5-mini-Instruct-ONNX-INT4](https://huggingface.co/nvidia/Phi-3.5-mini-Instruct-ONNX-INT4)
+
+## Quantized Models for Llama-3.2-1B-Instruct
+
+1. [Base Model] [onnx-community/Llama-3.2-1B-Instruct](https://huggingface.co/onnx-community/Llama-3.2-1B-Instruct)
+2. [AWQ] [llama-3.2-1B-Instruct-AWQ](https://huggingface.co/ciCic/llama-3.2-1B-Instruct-AWQ)
+3. [GPTQ INT4] [Almheiri/Llama-3.2-1B-Instruct-GPTQ-INT4](https://huggingface.co/Almheiri/Llama-3.2-1B-Instruct-GPTQ-INT4)
+4. [FP8 KV] [amd/Llama-3.2-1B-Instruct-FP8-KV](https://huggingface.co/amd/Llama-3.2-1B-Instruct-FP8-KV)
+
+## Quantized Models for Llama-3.2-3B-Instruct
+
+1. [Base Model] 
+
+## Quantized Models for Llama-3.2-7B-Instruct
+
+1. [Base Model] 
+
+## Quantized Models for Qwen2.5-7B-Instruct
+
+1. [Base Model] [Qwen/Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
+2. [AWQ] [Qwen/Qwen2.5-7B-Instruct-AWQ](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-AWQ)
+3. [GPTQ Int4] [Qwen/Qwen2.5-7B-Instruct-GPTQ-Int4](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GPTQ-Int4)
+4. [GPTQ Int8] [Qwen/Qwen2.5-7B-Instruct-GPTQ-Int8](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GPTQ-Int8)
+5. [Q4F16_1 MLC] [mlc-ai/Qwen2.5-7B-Instruct-q4f16_1-MLC](https://huggingface.co/mlc-ai/Qwen2.5-7B-Instruct-q4f16_1-MLC)
+6. [BNB 4-bit] [unsloth/Qwen2.5-7B-Instruct-bnb-4bit](https://huggingface.co/unsloth/Qwen2.5-7B-Instruct-bnb-4bit)
+
+## Quantized Models for Falcon3-7B-Instruct
+
+1. [Base Model] [tiiuae/Falcon3-7B-Instruct](https://huggingface.co/tiiuae/Falcon3-7B-Instruct)
+2. [GPTQ Int4] [tiiuae/Falcon3-7B-Instruct-GPTQ-Int4](https://huggingface.co/tiiuae/Falcon3-7B-Instruct-GPTQ-Int4)
+3. [GPTQ Int8] [tiiuae/Falcon3-7B-Instruct-GPTQ-Int8](https://huggingface.co/tiiuae/Falcon3-7B-Instruct-GPTQ-Int8)
+4. [AWQ] [tiiuae/Falcon3-7B-Instruct-AWQ](https://huggingface.co/tiiuae/Falcon3-7B-Instruct-AWQ)
+
+
 
 ### Step 1. Set up the endpoint config to your model
 

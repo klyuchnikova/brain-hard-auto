@@ -384,7 +384,6 @@ def http_completion_gemini(model, message, temperature, max_tokens):
     output = response.json()["candidates"][0]["content"]["parts"][0]["text"]
 
     return output
-    
 
 
 def chat_completion_cohere(model, messages, temperature, max_tokens):
