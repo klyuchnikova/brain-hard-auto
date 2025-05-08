@@ -153,8 +153,14 @@ if __name__ == "__main__":
         assert wandb_key is not None, "WANDB_API_KEY is not set, but wandb option is present"
         log_message(f"Logging in to wandb...")
         wandb.login(key=wandb_key)
+        wandb.require("service")
         log_message(f"Running gen answers with wandb! Project: {wandb_project}, Experiment: {wandb_experiment}")
-        wandb.init(project=wandb_project, name=wandb_experiment, resume=True)
+        wandb.init(
+            group=settings["bench_name"],
+            project=wandb_project,
+            name=wandb_experiment,
+            resume="allow"
+        )
     max_answers = args.max_answers
     existing_answer = load_model_answers(os.path.join("data", settings["bench_name"], "model_answer"))
     print(f"Settings: {settings}")
@@ -189,6 +195,11 @@ if __name__ == "__main__":
 
         answer_file = args.save_path or os.path.join("data", settings["bench_name"], "model_answer", f"{model}.jsonl")
         log_message(f"Output to {answer_file}")
+        with open(answer_file, "r") as f:
+            number_answers = len(f.readlines())
+        if number_answers == len(questions):
+            log_message(f"The number of answers matches the number of questions so the model will be skipped")
+            continue
 
         if "parallel" in endpoint_info:
             parallel = endpoint_info["parallel"]
@@ -222,7 +233,12 @@ if __name__ == "__main__":
                 'parallel': parallel,
                 'max_tokens': max_tokens
             }
-            wandb.config.update({f'{model}/config': model_config}, allow_val_change=True)
+            print(model)
+            try:
+                wandb.config.update({f'{model}/config': model_config}, allow_val_change=True)
+                model_was_present = false
+            except:
+                continue
 
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=parallel) as executor:

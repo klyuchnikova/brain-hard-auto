@@ -28,3 +28,75 @@ gpt-4-1106-preview:
     endpoints: null
     api_type: openai
     parallel: 8
+
+qwen-2.5-7b-base:
+    model_name: Qwen2.5-7B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+qwen-2.5-7b-int4:
+    model_name: Qwen2.5-7B-Instruct-GPTQ-Int4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+qwen-2.5-7b-int8:
+    model_name: Qwen2.5-7B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+qwen-2.5-7b-awq:
+    model_name: Qwen2.5-7B-Instruct-AWQ
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-base:
+    model_name: Falcon3-7B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-int4:
+    model_name: Falcon3-7B-Instruct-GPTQ-Int4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-int8:
+    model_name: Falcon3-7B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-awq:
+    model_name: Falcon3-7B-Instruct-AWQ
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
