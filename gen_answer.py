@@ -149,23 +149,18 @@ if __name__ == "__main__":
     if args.wandb:
         wandb_key = os.environ.get('WANDB_API_KEY', None)
         wandb_project = os.environ.get('WANDB_PROJECT', 'arena-hard-auto')
-        wandb_experiment = os.environ.get('WANDB_NAME', f'Experiment at {time.time()}')
         assert wandb_key is not None, "WANDB_API_KEY is not set, but wandb option is present"
         log_message(f"Logging in to wandb...")
         wandb.login(key=wandb_key)
         wandb.require("service")
-        log_message(f"Running gen answers with wandb! Project: {wandb_project}, Experiment: {wandb_experiment}")
-        wandb.init(
-            group=settings["bench_name"],
-            project=wandb_project,
-            name=wandb_experiment,
-            resume="allow"
-        )
+        log_message(f"Running gen answers with wandb! Project: {wandb_project}")
+
     max_answers = args.max_answers
     existing_answer = load_model_answers(os.path.join("data", settings["bench_name"], "model_answer"))
     print(f"Settings: {settings}")
 
     # Loading templates if they are set
+    active_models_to_run = []
     for model in settings["model_list"]:
         if isinstance(model, dict):
             model = list(model.keys())[0]
@@ -178,7 +173,14 @@ if __name__ == "__main__":
             raise RuntimeError("Could not find the output structure file while it was set. Please check that path: \"{structure_config}\" is correct")
         endpoint_list[model]["output_structured"] = load_structure_file(structure_config)
 
-    for model in settings["model_list"]:
+        if len(existing_answer[model]) == len(questions):
+            log_message(f"The number of answers matches the number of questions so the model will be skipped")
+            continue
+        active_models_to_run.append(model)
+
+    log_message(f"Finished loading configs. The models that will run are: {active_models_to_run}")
+
+    for model in active_models_to_run:
         if isinstance(model, dict):
             model = list(model.keys())[0]
         assert isinstance(model, str)
@@ -195,11 +197,6 @@ if __name__ == "__main__":
 
         answer_file = args.save_path or os.path.join("data", settings["bench_name"], "model_answer", f"{model}.jsonl")
         log_message(f"Output to {answer_file}")
-        with open(answer_file, "r") as f:
-            number_answers = len(f.readlines())
-        if number_answers == len(questions):
-            log_message(f"The number of answers matches the number of questions so the model will be skipped")
-            continue
 
         if "parallel" in endpoint_info:
             parallel = endpoint_info["parallel"]
@@ -234,11 +231,14 @@ if __name__ == "__main__":
                 'max_tokens': max_tokens
             }
             print(model)
-            try:
-                wandb.config.update({f'{model}/config': model_config}, allow_val_change=True)
-                model_was_present = false
-            except:
-                continue
+            wandb_experiment = os.environ.get('WANDB_NAME', endpoint_info["model_name"])
+            wandb.init(
+                group=settings["bench_name"],
+                project=wandb_project,
+                name=wandb_experiment,
+                resume="allow"
+            )
+            wandb.config.update({f'{model}/config': model_config}, allow_val_change=True)
 
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=parallel) as executor:
