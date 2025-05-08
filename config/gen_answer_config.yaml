@@ -12,3 +12,4 @@ model_list:
     - qwen-2.5-7b-int4
     - qwen-2.5-7b-int8
     - falcon-7b-base
+    - falcon-7b-int4

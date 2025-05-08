@@ -159,6 +159,9 @@ if __name__ == "__main__":
     existing_answer = load_model_answers(os.path.join("data", settings["bench_name"], "model_answer"))
     print(f"Settings: {settings}")
 
+    question_file = os.path.join("data", settings["bench_name"], "question.jsonl")
+    questions = load_questions(question_file)
+
     # Loading templates if they are set
     active_models_to_run = []
     for model in settings["model_list"]:
@@ -166,17 +169,16 @@ if __name__ == "__main__":
             model = list(model.keys())[0]
         assert isinstance(model, str)
         assert model in endpoint_list
+        if model in existing_answer and len(existing_answer[model]) == len(questions):
+            log_message(f"The number of answers matches the number of questions so the model {model} will be skipped")
+            continue
+        active_models_to_run.append(model)
         structure_config = endpoint_list[model].get("output_structured")
         if not structure_config:
             continue
         if not os.path.exists(structure_config):
             raise RuntimeError("Could not find the output structure file while it was set. Please check that path: \"{structure_config}\" is correct")
         endpoint_list[model]["output_structured"] = load_structure_file(structure_config)
-
-        if len(existing_answer[model]) == len(questions):
-            log_message(f"The number of answers matches the number of questions so the model will be skipped")
-            continue
-        active_models_to_run.append(model)
 
     log_message(f"Finished loading configs. The models that will run are: {active_models_to_run}")
 
@@ -187,9 +189,6 @@ if __name__ == "__main__":
         assert model in endpoint_list
         endpoint_info = endpoint_list[model]
         log_message(f"Running for model {model} with endpoint {endpoint_info}")
-
-        question_file = os.path.join("data", settings["bench_name"], "question.jsonl")
-        questions = load_questions(question_file)
 
         if max_answers:
             log_message(f"Will be cutting questions down to {max_answers} according to max-answers")
