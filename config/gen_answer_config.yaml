@@ -12,15 +12,15 @@ model_list:
     - qwen-2.5-7b-base
     - qwen-2.5-7b-int4
     - qwen-2.5-7b-int8
-    #- qwen-2.5-7b-awq
+    - qwen-2.5-7b-awq
     # Falcon-7B
     - falcon-7b-base
     - falcon-7b-int4
     - falcon-7b-int8
-    #- falcon-7b-awq
-    # Llama-3.2-1B-Instruct
-    # llama-3.2-1b-base -- need approval
-    #- llama-3.2-1b-awq
-    #- llama-3.2-1b-gptq-int4
-    #- llama-3.2-1b-gptq-int8
-    - llama-3.2-1b-fp8-kv
+    - falcon-7b-awq
+    # Llama-3.2-3B-Instruct
+    - llama-3.2-3b-base
+    - llama-3.2-3b-awq
+    - llama-3.2-3b-gptq-int4
+    #- llama-3.2-3b-gptq-int8
+    #- llama-3.2-3b-fp8-kv
