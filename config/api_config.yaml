@@ -100,3 +100,93 @@ falcon-7b-awq:
     api_type: openai
     system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
     parallel: 4
+
+llama-3.2-1b-base:
+    model_name: meta-llama/Llama-3.2-1B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-awq:
+    model_name: llama-3.2-1B-Instruct-AWQ
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-gptq-int4:
+    model_name: Llama-3.2-1B-Instruct-GPTQ-INT4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-gptq-int8:
+    model_name: Llama-3.2-1B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-fp8-kv:
+    model_name: Llama-3.2-1B-Instruct-FP8-KV
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-3b-base:
+    model_name: Llama-3.2-3B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-awq-int4:
+    model_name: Llama-3.2-3B-Instruct-AWQ-Int4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-gptq-int4:
+    model_name: Llama-3.2-3B-Instruct-GPTQ-Int4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-gptq-int8:
+    model_name: Llama-3.2-3B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-fp8-kv:
+    model_name: Llama-3.2-3B-Instruct-FP8-KV
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
