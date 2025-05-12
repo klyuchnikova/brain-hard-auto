@@ -19,8 +19,8 @@ model_list:
     - falcon-7b-int8
     - falcon-7b-awq
     # Llama-3.2-3B-Instruct
-    - llama-3.2-3b-base
-    - llama-3.2-3b-awq
+    #- llama-3.2-3b-base
+    #- llama-3.2-3b-awq
     - llama-3.2-3b-gptq-int4
     #- llama-3.2-3b-gptq-int8
     #- llama-3.2-3b-fp8-kv
