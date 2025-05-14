@@ -231,7 +231,6 @@ We have pre-generated many popular models answers and judgments. Check out the `
 ## Quantized Models for Phi 3.5 Mini Instruct
 
 1. [Base Model] [microsoft/Phi-3.5-mini-instruct](https://huggingface.co/microsoft/Phi-3.5-mini-instruct)
-1. [BNB 4-bit] [unsloth/Phi-3.5-mini-instruct-bnb-4bit](https://huggingface.co/unsloth/Phi-3.5-mini-instruct-bnb-4bit)
 2. [AWQ] [flowaicom/Flow-Judge-v0.1-AWQ](https://huggingface.co/flowaicom/Flow-Judge-v0.1-AWQ)
 3. [FP8 KV] [RedHatAI/Phi-3.5-mini-instruct-FP8-KV](https://huggingface.co/RedHatAI/Phi-3.5-mini-instruct-FP8-KV)
 4. [ONNX INT4] [nvidia/Phi-3.5-mini-Instruct-ONNX-INT4](https://huggingface.co/nvidia/Phi-3.5-mini-Instruct-ONNX-INT4)
@@ -244,11 +243,11 @@ We have pre-generated many popular models answers and judgments. Check out the `
 4. [GPTQ INT8] [clowman/Llama-3.2-1B-Instruct-GPTQ-Int8](https://huggingface.co/clowman/Llama-3.2-1B-Instruct-GPTQ-Int8)  
 5. [FP8 KV] [amd/Llama-3.2-1B-Instruct-FP8-KV](https://huggingface.co/amd/Llama-3.2-1B-Instruct-FP8-KV)  
 
-## Quantized Models for Llama-3.2-3B-Instruct  
+## Quantized Models for Llama-3.2-3B-Instruct
 
 1. [Base Model] [meta-llama/Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)  
 2. [AWQ] [clowman/Llama-3.2-3B-Instruct-AWQ-Int4](https://huggingface.co/clowman/Llama-3.2-3B-Instruct-AWQ-Int4)  
-3. [GPTQ INT4] [clowman/Llama-3.2-3B-Instruct-GPTQ-Int4](https://huggingface.co/clowman/Llama-3.2-3B-Instruct-GPTQ-Int4)  
+3. [GPTQ INT4] [fbaldassarri/meta-llama_Llama-3.2-3B-Instruct-auto_gptq-int4-gs128-asym](https://huggingface.co/fbaldassarri/meta-llama_Llama-3.2-3B-Instruct-auto_gptq-int4-gs128-asym)
 4. [GPTQ INT8] [clowman/Llama-3.2-3B-Instruct-GPTQ-Int8](https://huggingface.co/clowman/Llama-3.2-3B-Instruct-GPTQ-Int8)  
 5. [FP8 KV] [amd/Llama-3.2-3B-Instruct-FP8-KV](https://huggingface.co/amd/Llama-3.2-3B-Instruct-FP8-KV)
 
@@ -265,7 +264,6 @@ We have pre-generated many popular models answers and judgments. Check out the `
 2. [GPTQ Int4] [tiiuae/Falcon3-7B-Instruct-GPTQ-Int4](https://huggingface.co/tiiuae/Falcon3-7B-Instruct-GPTQ-Int4)
 3. [GPTQ Int8] [tiiuae/Falcon3-7B-Instruct-GPTQ-Int8](https://huggingface.co/tiiuae/Falcon3-7B-Instruct-GPTQ-Int8)
 4. [AWQ] [tiiuae/Falcon3-7B-Instruct-AWQ](https://huggingface.co/tiiuae/Falcon3-7B-Instruct-AWQ)
-
 
 
 ### Step 1. Set up the endpoint config to your model
