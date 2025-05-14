@@ -1,0 +1,60 @@
+name: judgment config file for Brain Hard
+
+bench_name: brain-hard-v0.1
+
+judge_model: gpt-4o
+baseline: true
+baseline_model: gpt-4o
+
+pairwise: False
+temperature: 0
+max_tokens: 2048 
+
+number_of_judgment_attempts: 1
+system_prompt: "### Task: Act as an impartial judge to evaluate the quality of an\
+  \ AI assistant's response. You will be provided a baseline answer for the given\
+  \ user prompt for clarity along with the aspects to mainly consider.\n\n### Steps:\n\
+  1. **General Conclusion** (1-2 sentences):\n   - Highlight major strengths/weaknesses/missed\
+  \ parts compared to the baseline.\n   - Note if the answer is entirely wrong, partially\
+  \ correct, or fully satisfies the prompt.\n\n2. **Aspect Ratings** (Per the user-provided\
+  \ list):  \n   - **Accuracy** → *True* (no errors), *Partial* (minor inaccuracies),\
+  \ *False* (major errors).  \n   - **Completeness** → *True* (covers all key points),\
+  \ *Partial* (misses some), *False* (omits critical details).  \n   - **Creativity/Novelty**\
+  \ → *True* (original insights), *Partial* (some added value), *False* (generic/repetitive).\
+  \  \n   - **Helpfulness** → *True* (fully addresses the prompt), *Partial* (partially\
+  \ useful), *False* (irrelevant).  \n\n3. **Verdict (1-5):**  \n   - **1** → Gibberish/wholly\
+  \ incorrect.  \n   - **2** → Major dissatisfaction (wrong/core aspects missed).\
+  \  \n   - **3** → Partial satisfaction (mixed quality).  \n   - **4** → Minor flaws\
+  \ (near-complete alignment).  \n   - **5** → Excellent (fully meets prompt, no flaws).\
+  \  \n\n#### **Output Format:**\n{\n  \"conclusion\": \"Summary of evaluation (e.g.,\
+  \ 'The assistant matches the baseline perfectly but lacks creative elaboration.').\"\
+  ,\n  \"aspects\": {\n    \"accuracy\": \"True/Partial/False\",\n    \"completeness\"\
+  : \"True/Partial/False\",\n    \"creativity\": \"True/Partial/False\",\n    // ...\
+  \ other specified aspects  \n  },\n  \"missing_info\": [\"Optional: List missing\
+  \ key points\"],\n  \"verdict\": 1-5  \n}\n\n### **Example Evaluation**\n<|User\
+  \ Prompt|>\nEarthworms live underground in the soil. As they move through the soil,\
+  \ they create tunnels. The tunnels help improve the soil. Plants grow better in\
+  \ soil that has earthworms. Which statement explains how earthworm tunnels help\
+  \ plants?\n\n<|The Start of Baseline Answer|>\nEarthworm tunnels improve soil structure,\
+  \ allowing better water infiltration and aeration, which in turn promotes healthier\
+  \ root growth and nutrient availability for plants, ultimately leading to better\
+  \ plant growth.\n<|The End of Baseline Answer|>\n\n<|The Start of Assistant Answer|>\n\
+  Earthworm tunnels help plants in several ways, primarily by improving soil structure\
+  \ and aeration. Here's a statement that explains how earthworm tunnels contribute\
+  \ to plant growth:\n\n\"Earthworm tunnels increase soil aeration and create pathways\
+  \ for water and nutrients to reach plant roots more easily, which in turn supports\
+  \ healthier plant growth.\"\n\nThis statement highlights the key benefits of earthworm\
+  \ tunnels, such as improved aeration and better access to water and nutrients, which\
+  \ are crucial for plant health and growth.\n<|The End of Assistant Answer|>\n\n\
+  Key aspects: accuracy, completeness\n\n{\n  \"conclusion\": \"The assistant's answer\
+  \ covers all key points accurately but is less concise than the baseline and has\
+  \ an awkward structure with unnecessary framing.\",\n  \"aspects\": {\n    \"accuracy\"\
+  : \"True\",\n    \"completeness\": \"True\"\n  },\n  \"verdict\": 4\n}"
+
+prompt_template: ["<|User Prompt|>\n{question}\n\n<|The Start of Baseline Answer|>\n{baseline}\n<|The End of Baseline Answer|>\n\n<|The Start of Assistant Answer|>\n{answer}\n<|The End of Assistant Answer|>\n\nKey aspects: {aspects}"]
+
+model_list:
+    - qwen-2.5-7b-base
+    - qwen-2.5-7b-int4
+    - qwen-2.5-7b-int8
+    - qwen-2.5-7b-awq
