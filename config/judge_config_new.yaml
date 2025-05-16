@@ -9,6 +9,7 @@ baseline_model: gpt-4o
 pairwise: False
 temperature: 0
 max_tokens: 2048 
+question_file: data/brain-hard-v0.1/questions_with_aspects.jsonl
 
 number_of_judgment_attempts: 1
 system_prompt: "### Task: Act as an impartial judge to evaluate the quality of an\
@@ -30,8 +31,7 @@ system_prompt: "### Task: Act as an impartial judge to evaluate the quality of a
   \ 'The assistant matches the baseline perfectly but lacks creative elaboration.').\"\
   ,\n  \"aspects\": {\n    \"accuracy\": \"True/Partial/False\",\n    \"completeness\"\
   : \"True/Partial/False\",\n    \"creativity\": \"True/Partial/False\",\n    // ...\
-  \ other specified aspects  \n  },\n  \"missing_info\": [\"Optional: List missing\
-  \ key points\"],\n  \"verdict\": 1-5  \n}\n\n### **Example Evaluation**\n<|User\
+  \ other specified aspects  \n  },\n  \"verdict\": 1-5  \n}\n\n### **Example Evaluation**\n<|User\
   \ Prompt|>\nEarthworms live underground in the soil. As they move through the soil,\
   \ they create tunnels. The tunnels help improve the soil. Plants grow better in\
   \ soil that has earthworms. Which statement explains how earthworm tunnels help\

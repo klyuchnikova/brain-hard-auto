@@ -1,0 +1,54 @@
+{
+  "format": {
+    "type": "json_schema",
+    "name": "evaluation_schema",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "conclusion": {
+          "type": "string",
+          "description": "Summary of evaluation"
+        },
+        "aspects": {
+          "type": "object",
+          "properties": {
+            "accuracy": {
+              "type": "string",
+              "enum": ["True", "Partial", "False"]
+            },
+            "completeness": {
+              "type": "string",
+              "enum": ["True", "Partial", "False"]
+            },
+            "relevance": {
+              "type": "string",
+              "enum": ["True", "Partial", "False"]
+            },
+            "creativity": {
+              "type": "string",
+              "enum": ["True", "Partial", "False"]
+            },
+            "conciseness": {
+              "type": "string",
+              "enum": ["True", "Partial", "False"]
+            },
+            "clarity": {
+              "type": "string",
+              "enum": ["True", "Partial", "False"]
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "verdict": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        }
+      },
+      "required": ["conclusion", "aspects", "verdict"],
+      "additionalProperties": false
+    },
+    "strict": true
+  }
+}
