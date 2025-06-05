@@ -173,7 +173,7 @@ def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=No
         )
     else:
         client = openai.OpenAI()
-    
+
     chat_completion_args = {
         "model" : model,
         "messages" : messages,
