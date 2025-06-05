@@ -7,6 +7,29 @@ import requests
 
 from typing import Optional
 from glob import glob
+from local_client import LocalClient
+from contextlib import contextmanager
+
+@contextmanager
+def no_proxy():
+    original_http_proxy = os.environ.pop('http_proxy', None)
+    original_https_proxy = os.environ.pop('https_proxy', None)
+    try:
+        yield
+    finally:
+        if original_http_proxy is not None:
+            os.environ['http_proxy'] = original_http_proxy
+        if original_https_proxy is not None:
+            os.environ['https_proxy'] = original_https_proxy
+
+def log_message(message):
+    if len(message) > 150:
+        print(f"{time.time()}: {message[:100]}...{message[-20:]}")
+    else:
+        print(f"{time.time()}: {message}")
+
+def log_error(e):
+    print(f"{time.time()}: {type(e)}: {e}")
 
 # API setting constants
 API_MAX_RETRY = 16
@@ -75,7 +98,7 @@ def load_model_answers(answer_dir: str):
 
 
 def get_endpoint(endpoint_list):
-    if endpoint_list is None:
+    if not endpoint_list:
         return None
     assert endpoint_list is not None
     # randomly pick one
@@ -93,8 +116,55 @@ def make_config(config_file: str) -> dict:
 
     return config_kwargs
 
+# load output srtucture in either json or yson format
+def load_structure_file(file_path):
+    _, file_extension = os.path.splitext(file_path)
+    if file_extension.lower() == '.json':
+        with open(file_path, 'r') as file:
+            return json.load(file)
 
-def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=None):
+    if file_extension.lower() == '.yaml':
+        with open(file_path, 'rb') as file:
+            return yaml.load(file, Loader=yaml.SafeLoader)
+
+    try:
+        with open(file_path, 'r') as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        pass
+    try:
+        with open(file_path, 'rb') as file:
+            return yaml.load(file, Loader=yaml.SafeLoader)
+    except yaml.YsonError:
+        pass
+    raise RuntimeError(f"Failed to parse the structure file: {file_path}. Ensure it is valid JSON or YAML.")
+
+def chat_completion_local(model: str, messages, temperature: float, max_tokens: int, api_dict=None):
+    client = LocalClient(
+        model=model,
+        options=api_dict,
+    )
+    output = API_ERROR_OUTPUT
+    for _ in range(API_MAX_RETRY):
+        try:
+            output = client.run(
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            break
+        except client.RateLimitError as e:
+            log_error(e)
+            time.sleep(API_RETRY_SLEEP)
+        except client.BadRequestError as e:
+            log_error(e)
+        except KeyError:
+            log_error(e)
+            break
+
+    return output
+
+def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=None, response_format=None):
     import openai
     if api_dict:
         client = openai.OpenAI(
@@ -103,27 +173,67 @@ def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=No
         )
     else:
         client = openai.OpenAI()
-    output = API_ERROR_OUTPUT
+
+    chat_completion_args = {
+        "model" : model,
+        "messages" : messages,
+        "temperature" : temperature,
+        "max_tokens" : max_tokens
+    }
+
+    if response_format is not None:
+        chat_completion_args["extra_body"] = {"guided_json": response_format}
+
+    def parse_completion(completion):
+        if completion.choices is not None:
+            choice = completion.choices[0]
+        else:
+            if hasattr(completion.response, 'choices'):
+                choice = completion.response.choices[0]
+            else:
+                choice = completion.response["choices"][0]
+
+        if hasattr(choice, 'message'):
+            message = choice.message
+        elif isinstance(choice, dict) and 'message' in choice:
+            message = choice['message']
+        else:
+            raise TypeError(f"Unexpected choice structure: {choice}")
+
+        if hasattr(message, 'content'):
+            content = message.content
+        elif isinstance(message, dict) and 'content' in message:
+            content = message['content']
+        else:
+            raise TypeError(f"Unexpected choice structure: {choice}")
+        return content
+
+    content = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
+        completion = None
         try:
-            completion = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-            )
-            output = completion.choices[0]['message']['content']
+            completion = client.chat.completions.create(**chat_completion_args)
+            content = parse_completion(completion)
             break
         except openai.RateLimitError as e:
-            print(type(e), e)
+            log_error(e)
             time.sleep(API_RETRY_SLEEP)
         except openai.BadRequestError as e:
-            print(messages)
-            print(type(e), e)
+            log_message(f"Bad request, messages: {messages}")
+            log_error(e)
         except KeyError:
-            print(type(e), e)
+            print(type(e), e, completion)
             break
-    return output
+        except Exception as e:
+            try:
+                models = client.models.list()
+                log_message(f"Api Client got available models: {models}, however something went wrong for {model}")
+            except:
+                log_message(f"Api Client unreachable")
+            log_error(e)
+            print(f"Received completion: {completion}")
+            raise
+    return content
 
 
 def chat_completion_openai_azure(model, messages, temperature, max_tokens, api_dict=None):
@@ -153,13 +263,13 @@ def chat_completion_openai_azure(model, messages, temperature, max_tokens, api_d
             output = response.choices[0].message.content
             break
         except openai.RateLimitError as e:
-            print(type(e), e)
+            log_error(e)
             time.sleep(API_RETRY_SLEEP)
         except openai.BadRequestError as e:
-            print(type(e), e)
+            log_error(e)
             break
         except KeyError:
-            print(type(e), e)
+            log_error(e)
             break
 
     return output
@@ -193,7 +303,7 @@ def chat_completion_anthropic(model, messages, temperature, max_tokens, api_dict
             output = response.content[0].text
             break
         except anthropic.APIError as e:
-            print(type(e), e)
+            log_error(e)
             time.sleep(API_RETRY_SLEEP)
     return output
 
@@ -220,7 +330,7 @@ def chat_completion_mistral(model, messages, temperature, max_tokens):
             output = chat_response.choices[0].message.content
             break
         except MistralException as e:
-            print(type(e), e)
+            log_error(e)
             break
 
     return output
@@ -274,7 +384,6 @@ def http_completion_gemini(model, message, temperature, max_tokens):
     output = response.json()["candidates"][0]["content"]["parts"][0]["text"]
 
     return output
-    
 
 
 def chat_completion_cohere(model, messages, temperature, max_tokens):
@@ -310,10 +419,10 @@ def chat_completion_cohere(model, messages, temperature, max_tokens):
             output = response.text
             break
         except cohere.core.api_error.ApiError as e:
-            print(type(e), e)
+            log_error(e)
             raise
         except Exception as e:
-            print(type(e), e)
+            log_error(e)
             break
     
     return output

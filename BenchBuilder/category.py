@@ -10,6 +10,8 @@
 #         - score
 import ast
 import re
+import os
+import json
 
 
 class Category:
@@ -17,8 +19,8 @@ class Category:
         pass
 
     @staticmethod
-    def create_category(name):
-        if name == "criteria_v0.1":
+    def create_category(name=None):
+        if name is None or name == "criteria_v0.1":
             return CategoryHardPrompt()
         raise Exception(f"Category name is incorrect: {name}")
 
@@ -31,7 +33,19 @@ class CategoryHardPrompt(Category):
         super().__init__()
         self.name_tag = "criteria_v0.1"
         self.pattern = re.compile(r"(\[[1234567](?:\,\s[1234567])*\])")
-        self.sys_prompt = "Your task is to evaluate how well the following input prompts can assess the capabilities of advanced AI assistants.\n\nFor the input prompt, please analyze it based on the following 7 criteria.\n1. Specificity: Does the prompt ask for a specific output, such as code, a mathematical solution, a logical simplification, a problem-solving strategy, or a hardware setup recommendation? This specificity allows the AI to demonstrate its ability to understand and generate precise responses.\n2. Domain Knowledge: Does the prompt cover a specific domain, such as programming, mathematics, logic, problem-solving, or hardware setup? Prompts spanning a range of topics test the AI's breadth of knowledge and its ability to apply that knowledge to different domains.\n3. Complexity: Does the prompt vary in complexity, from straightforward tasks to more complex, multi-step problems? This allows evaluators to assess the AI's capability to handle problems of varying difficulty.\n4. Problem-Solving Skills: Does the prompt directly involves the AI to demonstrate active problem-solving skills, such systemically coming up with a solution for a specific setup instead of regurgitating an existing fact? This tests the AI's ability to apply logical reasoning and provide practical solutions.\n5. Creativity: Does the prompt involve a level of creativity in approaching the problem? This criterion tests the AI's ability to provide tailored solutions that take into account the user's specific needs and limitations.\n6. Technical Accuracy: Does the prompt require technical accuracy in the response? This allows evaluators to assess the AI's precision and correctness in technical fields.\n7. Real-world Application: Does the prompt relate to real-world applications, such as setting up a functional system or writing code for a practical use case? This tests the AI's ability to provide practical and actionable information that could be implemented in real-life scenarios.\n\nYou must list the criteria numbers that the prompt satisfies in the format of a Python array. For example, \"[...]\". Do not explain your choice."
+        asssets_folder = os.path.join(os.path.dirname(__file__), 'assets')
+
+        with open(os.path.join(asssets_folder, "schema.json"), 'r', encoding='utf-8') as file:
+            self.output_schema = json.load(file)
+
+        with open(os.path.join(asssets_folder, "prompt.txt"), 'r', encoding='utf-8') as file:
+            self.sys_prompt = file.read()
+        self.content_prompt = """
+--- Input:
+{{
+    "prompt": {prompt}
+}}"""
+
         self.tags = {
             1: "specificity",
             2: "domain_knowledge",
@@ -58,9 +72,11 @@ class CategoryHardPrompt(Category):
 
     def pre_process(self, prompt):
         conv = [{"role": "system", "content": self.sys_prompt}]
-        conv.append({"role": "user", "content": prompt})
+        conv.append({"role": "user", "content": self.content_prompt.format(prompt=prompt)})
         return conv
 
     def post_process(self, judgment):
-        criteria = self.get_score(judgment=judgment)
-        return {name: bool(i in criteria) for i, name in self.tags.items()}
+        if judgment is None:
+            return {}
+        result = json.loads(judgment)
+        return result

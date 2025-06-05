@@ -43,7 +43,18 @@ def get_endpoint(endpoint_list):
     return api_dict
 
 
-def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=None):
+def log_message(message):
+    if len(message) > 150:
+        print(f"{time.time()}: {message[:100]}...{message[-20:]}")
+    else:
+        print(f"{time.time()}: {message}")
+
+
+def log_error(e):
+    print(f"{time.time()}: {type(e)}: {e}")
+
+
+def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=None, response_format=None):
     import openai
 
     if api_dict:
@@ -54,41 +65,66 @@ def chat_completion_openai(model, messages, temperature, max_tokens, api_dict=No
     else:
         client = openai.OpenAI()
 
-    output = API_ERROR_OUTPUT
+    chat_completion_args = {
+        "model" : model,
+        "messages" : messages,
+        "temperature" : temperature,
+        "max_tokens" : max_tokens
+    }
+
+    if response_format is not None:
+        chat_completion_args["extra_body"] = {"guided_json": response_format}
+
+    def parse_completion(completion):
+        if completion.choices is not None:
+            choice = completion.choices[0]
+        else:
+            if hasattr(completion.response, 'choices'):
+                choice = completion.response.choices[0]
+            else:
+                choice = completion.response["choices"][0]
+
+        if hasattr(choice, 'message'):
+            message = choice.message
+        elif isinstance(choice, dict) and 'message' in choice:
+            message = choice['message']
+        else:
+            raise TypeError(f"Unexpected choice structure: {choice}")
+
+        if hasattr(message, 'content'):
+            content = message.content
+        elif isinstance(message, dict) and 'content' in message:
+            content = message['content']
+        else:
+            raise TypeError(f"Unexpected choice structure: {choice}")
+        return content
+
+    content = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
+        completion = None
         try:
-            # print(messages)
-            completion = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                # extra_body={"guided_choice": GUIDED_CHOICES} if GUIDED_CHOICES else None,
-            )
-            output = completion.choices[0].message.content
-            # print(output)
+            completion = client.chat.completions.create(**chat_completion_args)
+            content = parse_completion(completion)
             break
         except openai.RateLimitError as e:
-            print(type(e), e)
+            log_error(e)
             time.sleep(API_RETRY_SLEEP)
         except openai.BadRequestError as e:
-            print(messages)
-            print(type(e), e)
+            log_message(f"Bad request, messages: {messages}")
+            log_error(e)
+        except KeyError:
+            print(type(e), e, completion)
             break
-        except openai.APIConnectionError as e:
-            print(messages)
-            print(type(e), e)
-            time.sleep(API_RETRY_SLEEP)
-        except openai.InternalServerError as e:
-            print(messages)
-            print(type(e), e)
-            time.sleep(API_RETRY_SLEEP)
         except Exception as e:
-            print(type(e), e)
-            break
-
-    return output
-
+            try:
+                models = client.models.list()
+                log_message(f"Api Client got available models: {models}, however something went wrong for {model}")
+            except:
+                log_message(f"Api Client unreachable")
+            log_error(e)
+            print(f"Received completion: {completion}")
+            raise
+    return content
 
 def chat_completion_anthropic(model, messages, temperature, max_tokens, api_dict=None):
     import anthropic
@@ -132,7 +168,7 @@ def get_answer(
     api_dict: dict,
     categories: list,
     api_type: str,
-    testing: bool,
+    testing: bool
 ):
     if "category_tag" in question:
         category_tag = question["category_tag"]
@@ -150,6 +186,7 @@ def get_answer(
                 temperature=temperature,
                 max_tokens=max_tokens,
                 api_dict=api_dict,
+                response_format=category.output_schema
             )
         elif api_type == "anthropic":
             output = chat_completion_anthropic(
@@ -209,6 +246,7 @@ def find_required_tasks(row):
         )
     ]
 
+
 def _get_prompt(convo: List[Dict]):
     prompt = ""
     for i in range(0, len(convo), 2):
@@ -218,12 +256,12 @@ def _get_prompt(convo: List[Dict]):
             prompt += f"{convo[i]['content'][0]}\n"
     return prompt
 
+
 def _get_uid(row: pd.Series):
     if "question_id" in row.index and "tstamp" in row.index:
         return str(row["question_id"]) + str(row["tstamp"])
     else:
         return str(row.name)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -254,7 +292,6 @@ if __name__ == "__main__":
         data = orjson.loads(f.read())
     input_data = pd.DataFrame(data)
 
-    # much faster than pd.apply
     input_data["uid"] = input_data.apply(_get_uid, axis=1)
     assert len(input_data) == len(input_data.uid.unique())
     print(f"{len(input_data)}# of input data just loaded")

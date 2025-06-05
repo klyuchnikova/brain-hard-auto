@@ -4,13 +4,21 @@
 #         - api_base: str
 #           api_key: str
 #           api_version: str optional (only for azure)
+#           model_path: str optional (only for local inference)
 #     api_type: str
 #     tokenizer: str optional (to optimize token limits)
 #     parallel: int
 #     system_prompt: str optional (add system instruction when generating model answer)
+#     output_structured: str optional (add json format for structured answer generation) providing a path to the file with structured configuration
 
 gpt-3.5-turbo-0125:
     model_name: gpt-3.5-turbo-0125
+    endpoints: null
+    api_type: openai
+    parallel: 8
+
+gpt-4o:
+    model_name: gpt-4o
     endpoints: null
     api_type: openai
     parallel: 8
@@ -25,4 +33,166 @@ gpt-4-1106-preview:
     model_name: gpt-4-1106-preview
     endpoints: null
     api_type: openai
+    parallel: 8
+
+qwen-2.5-7b-base:
+    model_name: Qwen2.5-7B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+qwen-2.5-7b-int4:
+    model_name: Qwen2.5-7B-Instruct-GPTQ-Int4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+qwen-2.5-7b-int8:
+    model_name: Qwen2.5-7B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+qwen-2.5-7b-awq:
+    model_name: Qwen2.5-7B-Instruct-AWQ
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-base:
+    model_name: Falcon3-7B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-int4:
+    model_name: Falcon3-7B-Instruct-GPTQ-Int4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-int8:
+    model_name: Falcon3-7B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+falcon-7b-awq:
+    model_name: Falcon3-7B-Instruct-AWQ
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 4
+
+llama-3.2-1b-base:
+    model_name: meta-llama/Llama-3.2-1B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-awq:
+    model_name: llama-3.2-1B-Instruct-AWQ
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-gptq-int4:
+    model_name: Llama-3.2-1B-Instruct-GPTQ-INT4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-gptq-int8:
+    model_name: Llama-3.2-1B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-1b-fp8-kv:
+    model_name: Llama-3.2-1B-Instruct-FP8-KV
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 16
+
+llama-3.2-3b-base:
+    model_name: Llama-3.2-3B-Instruct
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-awq:
+    model_name: Llama-3.2-3B-Instruct-AWQ
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-gptq-int4:
+    model_name: Llama-3.2-3B-Instruct-GPTQ-Int4
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-gptq-int8:
+    model_name: Llama-3.2-3B-Instruct-GPTQ-Int8
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
+    parallel: 8
+
+llama-3.2-3b-fp8-kv:
+    model_name: Llama-3.2-3B-Instruct-FP8-KV
+    endpoints:
+        - api_base: http://localhost:8000/v1
+          api_key: 123
+    api_type: openai
+    system_prompt: "You are a helpful assistant, answer the user's question accurately and concisely."
     parallel: 8

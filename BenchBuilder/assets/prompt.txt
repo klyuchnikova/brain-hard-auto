@@ -1,0 +1,100 @@
+### Task
+Your task is to evaluate how well the following input prompts can assess the capabilities of advanced AI assistants.
+For the input prompt, please analyze it based on the following 8 criteria giving a 1 to 5 mark for each.
+1. Specificity [specificity]
+    - Characteristics: whether the question requires a specific output, such as code, a mathematical solution, a logical simplification, a problem-solving strategy, or a hardware setup recommendation. 
+    - 1 grade means that the question does not require any specific structure.
+    - 5 grade means that the question requires a complex and specific structure such as mentioned.
+    - Examples: If answer format is given it's a 5. "Write python implementation of factorial" is 5, "Can you describe an elephant?" is 1.
+2. Domain Knowledge [domain_knowledge]
+    - Characteristics: whether the question covers a specific domain, such as programming, mathematics, history etc. 
+    - 1 grade means that the answer does not require any deep knowledge of a specific domain, common knowledge is enough.
+    - 5 grade means that the question touches a range of topics or/and different domains.
+    - Examples: "Who was the president of the US in 1975?" is 4 since a medium level specialist would answer, "What is the name of the highest mountain" is 1 since everyone knows that.
+3. Complexity [complexity]
+    - Characteristics: whether the question requires a complex, multi-step solution.
+    - 1 grade means that the answer does not require any thought process or uncommon knowledge.
+    - 5 grade means that the question requires a complex multi step thought.
+    - Examples: "What's a python?" is 1. "How can I reload windows?" is 2. Any difficult math / physics task is 5.
+4. Problem-Solving Skills [problem_solving]
+    - Characteristics: whether the answer should demonstrate active problem-solving skills.
+    - 1 grade means that the answer does not require any thought process and is regurgitating an existing fact. 
+    - 5 grade means that the question requires a complex multi step thought.
+    - "Can you name top cat breeds?" is 2 since it almost does not require thought process. "you are given a task to detect number of faces in each frame of any video using pytorch" is 5.
+5. Creativity [creativity]
+    - Characteristics: assesses whether the response requires to think up a creative novel approach.
+    - 1 grade means that the answer requires a straightforward or factual response with no creativity.
+    - 5 grade means that the question invites a highly creative or novel approach, requiring the generation of unique ideas or solutions.
+    - Examples: "Count to ten" is 1. "Can you write code to print hello" is 2. "Can you think of a story ending that goes like this..." is 5.
+6. Technical Accuracy [technical_accuracy]
+    - Characteristics: assesses the levels of accuracy required for technical fields.
+    - 1 grade means that the answer can be very general or imprecise, with no need for specific technical accuracy.
+    - 5 grade means that the response must be meticulously accurate, reflecting deep technical expertise and attention to detail.
+    - Examples: "Can a three year old ride a bysicle" is 1, "How old is Donald Trump?" is 5. If the question expects a single correct answer that lacks numbers, it is 3.
+7. Real-world Application [real_world]
+    - Characteristics: how much thr prompt relates to real-world applications.
+    - 1 grade means that the question pertains to theoretical knowledge or information with no direct application.
+    - 5 grade means that the question demands an actionable solution applicable to real-life situations, requiring practical implementation guidance.
+    - Examples: "how much sweets can I eat before I get sick" is 3, "write bash file to start jupyter" is 5.
+8. Context-completion [context_complete]
+    - Characteristics: the question has a provided context relevant to the question that contains some hints.
+    - 1 grade means there is no context or it is not related to the question.
+    - 5 grade means there is obvious context provided for the question and it is **enough** to answer the question.
+    - Examples: If a piece of a wiki page is given and some question, 5 would mean that you can definitely answer the question based on the context, 3 if there is only partial answer to the question and 1 if none.
+
+Finally you will also have to try answering the prompt you were given. Be concise and accurate.
+Do not add anything additional to your answer.
+
+### Example 1
+-- Input:
+{
+    "prompt": "Write a Python function that calculates the factorial of a number using recursion."
+}
+-- Output:
+{
+    "specificity": 5,
+    "domain_knowledge": 4,
+    "complexity": 3,
+    "problem_solving": 3,
+    "creativity": 2,
+    "technical_accuracy": 4,
+    "real_world": 4,
+    "context_complete": 1,
+    "answer": "def factorial(n):\n    return 1 if n == 0 else n * factorial(n-1)"
+}
+
+### Example 2
+-- Input:
+{
+    "prompt": "You are given a paper:\nTitle: Cross-lingual Pre-training Based Transfer for Zero-shot Neural Machine Translation\nAbstract: Transfer learning between different language pairs has shown its effectiveness for Neural Machine Translation (NMT) in low-resource scenario. However, existing transfer methods involving a common target language are far from success in the extreme scenario of zero-shot translation. To this end, we introduce one monolingual pre-training method and two bilingual pre-training methods to obtain a universal encoder for different languages. Experiments on two public datasets show that our approach significantly outperforms strong pivot-based baseline and various multilingual NMT approaches.\n\nwhich multilingual approaches do they compare with?"
+}
+-- Output:
+{
+    "specificity": 1,
+    "domain_knowledge": 5,
+    "complexity": 2,
+    "problem_solving": 3,
+    "creativity": 2,
+    "technical_accuracy": 3,
+    "real_world": 4,
+    "context_complete": 4,
+    "answer": "The paper compares their approach with a pivot-based baseline and various multilingual NMT approaches (specific approaches not named in the abstract)."
+}
+
+### Example 3
+-- Input:
+{
+    "prompt": "Two processes are involved in the formation of a sand dune. Which two processes best describe how a sand dune forms?"
+}
+-- Output:
+{
+    "specificity": 1,
+    "domain_knowledge": 5,
+    "complexity": 3,
+    "problem_solving": 3,
+    "creativity": 2,
+    "technical_accuracy": 3,
+    "real_world": 3,
+    "context_complete": 1,
+    "answer": "The two processes involved in the formation of a sand dune are erosion and deposition. Wind erodes sand particles from one location and deposits them in another, leading to the accumulation of sand that forms a dune."
+}

@@ -13,11 +13,13 @@ import concurrent.futures
 import tiktoken
 import shortuuid
 import tqdm
+import wandb
 
 from add_markdown_info import count_markdown_elements, remove_pattern
 from utils import (
     load_questions,
     load_model_answers,
+    load_structure_file,
     make_config,
     get_endpoint,
     chat_completion_openai,
@@ -26,9 +28,11 @@ from utils import (
     chat_completion_mistral,
     http_completion_gemini,
     chat_completion_cohere,
+    chat_completion_local,
     reorg_answer_file,
     OPENAI_MODEL_LIST,
     temperature_config,
+    log_message
 )
 
 
@@ -79,12 +83,22 @@ def get_answer(
                                                 messages=conv,
                                                 temperature=temperature,
                                                 max_tokens=max_tokens)
-            else:
+            elif api_type == "openai":
+                response_format = endpoint_info.get("output_structured")
                 output = chat_completion_openai(model=endpoint_info["model_name"], 
                                                 messages=conv, 
                                                 temperature=temperature, 
                                                 max_tokens=max_tokens, 
+                                                api_dict=api_dict,
+                                                response_format=response_format)
+            elif api_type == "local":
+                output = chat_completion_local(model=endpoint_info["model_name"], 
+                                                messages=conv,
+                                                temperature=temperature,
+                                                max_tokens=max_tokens,
                                                 api_dict=api_dict)
+            else:
+                raise Exception(f"Unknown client: {api_type}")
             conv.append({"role": "assistant", "content": output})
 
             turns.append({"content": output})
@@ -119,30 +133,75 @@ if __name__ == "__main__":
     parser.add_argument(
         "--endpoint-file", type=str, default="config/api_config.yaml"
     )
+    parser.add_argument(
+        "--wandb", action='store_true', help="Turns on logging with wandb, will use environment variables for it"
+    )
+    parser.add_argument(
+        "--max-answers", type=int, default=None
+    )
+    parser.add_argument(
+        "--save-path", type=str, default=None
+    )
     args = parser.parse_args()
 
     settings = make_config(args.setting_file)
     endpoint_list = make_config(args.endpoint_file)
+    if args.wandb:
+        wandb_key = os.environ.get('WANDB_API_KEY', None)
+        wandb_project = os.environ.get('WANDB_PROJECT', 'arena-hard-auto')
+        assert wandb_key is not None, "WANDB_API_KEY is not set, but wandb option is present"
+        log_message(f"Logging in to wandb...")
+        wandb.login(key=wandb_key)
+        wandb.require("service")
+        log_message(f"Running gen answers with wandb! Project: {wandb_project}")
 
+    max_answers = args.max_answers
     existing_answer = load_model_answers(os.path.join("data", settings["bench_name"], "model_answer"))
-    
-    print(settings)
+    print(f"Settings: {settings}")
 
+    question_file = os.path.join("data", settings["bench_name"], "question.jsonl")
+    questions = load_questions(question_file)
+
+    # Loading templates if they are set
+    active_models_to_run = []
     for model in settings["model_list"]:
+        if isinstance(model, dict):
+            model = list(model.keys())[0]
+        assert isinstance(model, str)
+        assert model in endpoint_list
+        if model in existing_answer and len(existing_answer[model]) == len(questions):
+            log_message(f"The number of answers matches the number of questions so the model {model} will be skipped")
+            continue
+        active_models_to_run.append(model)
+        structure_config = endpoint_list[model].get("output_structured")
+        if not structure_config:
+            continue
+        if not os.path.exists(structure_config):
+            raise RuntimeError("Could not find the output structure file while it was set. Please check that path: \"{structure_config}\" is correct")
+        endpoint_list[model]["output_structured"] = load_structure_file(structure_config)
+
+    log_message(f"Finished loading configs. The models that will run are: {active_models_to_run}")
+
+    for model in active_models_to_run:
+        if isinstance(model, dict):
+            model = list(model.keys())[0]
+        assert isinstance(model, str)
         assert model in endpoint_list
         endpoint_info = endpoint_list[model]
+        log_message(f"Running for model {model} with endpoint {endpoint_info}")
 
-        question_file = os.path.join("data", settings["bench_name"], "question.jsonl")
-        questions = load_questions(question_file)
+        if max_answers:
+            log_message(f"Will be cutting questions down to {max_answers} according to max-answers")
+            questions = questions[:max_answers]
 
-        answer_file = os.path.join("data", settings["bench_name"], "model_answer", f"{model}.jsonl")
-        print(f"Output to {answer_file}")
+        answer_file = args.save_path or os.path.join("data", settings["bench_name"], "model_answer", f"{model}.jsonl")
+        log_message(f"Output to {answer_file}")
 
         if "parallel" in endpoint_info:
             parallel = endpoint_info["parallel"]
         else:
             parallel = 1
-
+      
         # We want to maximizes the number of tokens generate per answer: max_tokens = specified token # - input tokens #
         if "tokenizer" in endpoint_info:
             question_list = [question["turns"][0]["content"] for question in questions]
@@ -161,6 +220,26 @@ if __name__ == "__main__":
         else:
             max_tokens = [settings["max_tokens"]] * len(questions)
 
+        if args.wandb:
+            # log current configuration for certain graph
+            model_config = {
+                'endpoint_info' : endpoint_info,
+                'question_file': question_file,
+                'answer_file': answer_file,
+                'parallel': parallel,
+                'max_tokens': max_tokens
+            }
+            print(model)
+            wandb_experiment = os.environ.get('WANDB_NAME', endpoint_info["model_name"])
+            wandb.init(
+                group=settings["bench_name"],
+                project=wandb_project,
+                name=wandb_experiment,
+                resume="allow"
+            )
+            wandb.config.update({f'{model}/config': model_config}, allow_val_change=True)
+
+        start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=parallel) as executor:
             futures = []
             count = 0
@@ -181,10 +260,17 @@ if __name__ == "__main__":
                 )
                 futures.append(future)
             if count > 0:
-                print(f"{count} number of existing answers")
-            for future in tqdm.tqdm(
-                concurrent.futures.as_completed(futures), total=len(futures)
+                log_message(f"{count} number of existing answers")
+            for question_index, future in tqdm.tqdm(
+                enumerate(concurrent.futures.as_completed(futures)), total=len(futures)
             ):
                 future.result()
+                time_passed = time.time() - start_time
+                if args.wandb:
+                    wandb.log({
+                        f"{model}/time_passed": time_passed
+                    }, step=question_index)
 
         reorg_answer_file(answer_file)
+        if args.wandb:
+            wandb.finish()

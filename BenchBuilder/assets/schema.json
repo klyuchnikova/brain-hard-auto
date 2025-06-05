@@ -1,0 +1,73 @@
+{
+    "name": "evaluate_attributes",
+    "description": "Evaluates various attributes on a scale from 1 to 5 and give an answer",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "specificity": {
+                "type": "integer",
+                "description": "Rating for specificity, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "domain_knowledge": {
+                "type": "integer",
+                "description": "Rating for domain knowledge, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "complexity": {
+                "type": "integer",
+                "description": "Rating for complexity, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "problem_solving": {
+                "type": "integer",
+                "description": "Rating for problem-solving, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "creativity": {
+                "type": "integer",
+                "description": "Rating for creativity, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "technical_accuracy": {
+                "type": "integer",
+                "description": "Rating for technical accuracy, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "real_world": {
+                "type": "integer",
+                "description": "Rating for real-world applicability, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "context_complete": {
+                "type": "integer",
+                "description": "Rating for context completeness, from 1 to 5",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "answer": {
+                "type": "string",
+                "description": "Answer to the prompt"
+            }
+        },
+        "required": [
+            "specificity",
+            "domain_knowledge",
+            "complexity",
+            "problem_solving",
+            "creativity",
+            "technical_accuracy",
+            "real_world",
+            "context_complete",
+            "answer"
+        ],
+        "additionalProperties": false
+    }
+}

@@ -1,6 +1,6 @@
 name: judgment config file for Arena Hard
 
-bench_name: arena-hard-v0.1
+bench_name: brain-hard-v0.1
 
 # Arena Hard default
 judge_model: gpt-4-1106-preview
@@ -12,7 +12,7 @@ baseline_model: gpt-4-0314
 
 pairwise: True
 temperature: 0
-max_tokens: 4096
+max_tokens: 2048
 
 regex_pattern: \[\[([AB<>=]+)\]\]
 number_of_judgment_attempts: 2
